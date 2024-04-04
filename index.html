@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GitHub Actions</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h1>GitHub Actions</h1>
+  <ul id="action-list"></ul>
+
+  <script>
+    const actionList = document.getElementById('action-list');
+
+    function fetchActions() {
+      axios.get('/actions')
+        .then(response => {
+          const actions = response.data;
+          actionList.innerHTML = '';
+          actions.forEach(action => {
+            const listItem = document.createElement('li');
+            let message;
+            if (action.action === 'push') {
+              message = `${action.author} pushed to ${action.to_branch} on ${new Date(action.timestamp).toLocaleString()}`;
+            } else if (action.action === 'pull_request') {
+              message = `${action.author} submitted a pull request from ${action.from_branch} to ${action.to_branch} on ${new Date(action.timestamp).toLocaleString()}`;
+            } else if (action.action === 'merge') {
+              message = `${action.author} merged branch ${action.from_branch} to ${action.to_branch} on ${new Date(action.timestamp).toLocaleString()}`;
+            }
+            listItem.textContent = message;
+            actionList.appendChild(listItem);
+          });
+        })
+        .catch(error => console.error(error));
+    }
+
+    setInterval(fetchActions, 15000);
+    fetchActions();
+  </script>
+</body>
+</html>
